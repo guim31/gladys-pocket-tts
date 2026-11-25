@@ -30,6 +30,14 @@ Gladys before reporting a problem.
 
 In scope: the code of this repository and the Docker image it publishes.
 
+What the integration handles: the addresses of your Pocket TTS servers and the
+voice names, stored by Gladys in the integration configuration (nothing is
+written under `/data`, no secret is asked). The texts to speak are sent in
+HTTP (or HTTPS) to the servers you configure, on your local network, and kept in
+memory only (the 16 latest clips); they are never written to the logs. An
+address with a user name or password is refused.
+
 Out of scope: Gladys Assistant itself (see its
 [security policy](https://github.com/GladysAssistant/Gladys/security/policy)),
-and the third-party services and devices the integration talks to.
+and Pocket TTS, its models and voices (see
+[kyutai-labs/pocket-tts](https://github.com/kyutai-labs/pocket-tts)).

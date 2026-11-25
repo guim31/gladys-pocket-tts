@@ -1,67 +1,111 @@
-# Template de démonstration
+# Pocket TTS
 
-Ceci est la documentation utilisateur de l'intégration. Gladys ré-héberge ce
-fichier et affiche un lien **Documentation** permanent vers lui dans l'écran
-de configuration (dans la langue de l'utilisateur, avec l'anglais en repli) —
-c'est au moment de configurer que l'utilisateur en a le plus besoin. Gardez
-les courtes indications d'accueil dans les blocs `section` du `config_schema`
-du manifest ; mettez ici le pas-à-pas détaillé (captures d'écran, dépannage…).
+Donne à Gladys une voix naturelle avec **Pocket TTS**, le modèle de synthèse
+vocale de [Kyutai](https://kyutai.org) (laboratoire de recherche français). Il
+tourne sur un simple **processeur, sans carte graphique**, sur une machine de
+votre réseau : les textes restent chez vous. Les annonces des scènes sont dites
+par lui sur vos enceintes.
 
 ## Ce que vous obtenez
 
-Six appareils de démonstration apparaissent après l'installation : une
-station météo (vraies données Open-Meteo), un interrupteur, une lampe
-variable, une prise connectée avec mesure de puissance, un détecteur de
-mouvement et une caméra.
+- Une **voix pour Gladys** (Gladys 5.3.0 ou plus) : une fois choisie, l'action
+  de scène **Parler sur une enceinte** parle avec Pocket TTS sur vos enceintes
+  (Sonos, Google Cast, AirPlay…).
+- **Français, anglais, allemand et espagnol** : un serveur Pocket TTS charge
+  une langue, et chaque langue de Gladys peut avoir son propre serveur. Chaque
+  utilisateur entend sa langue.
+- **Une voix par langue** : l'une des 27 voix intégrées (estelle en français,
+  juergen en allemand, lola en espagnol, alba et vingt autres en anglais), ou
+  votre propre voix clonée depuis un fichier WAV.
+- Des boutons **Tester la voix** et **Afficher les voix** dans la
+  configuration.
+- Deux déclencheurs de scène : **Serveur Pocket TTS indisponible** et
+  **Serveur Pocket TTS revenu**, par exemple pour être prévenu quand les
+  annonces ne peuvent plus être dites.
+
+## Avant de commencer
+
+- Lancez un serveur Pocket TTS sur une machine de votre réseau (Linux, macOS
+  ou Windows, environ 500 Mo de mémoire par serveur), avec la langue voulue :
+  - avec le binaire autonome des
+    [releases](https://github.com/kyutai-labs/pocket-tts/releases) (ni Python
+    ni PyTorch nécessaires) :
+    `./pocket-tts serve --host 0.0.0.0 --language french` ;
+  - ou avec Python : `uvx pocket-tts serve --host 0.0.0.0 --language french`.
+- Langues : `french`, `english`, `german`, `spanish` (et `italian`,
+  `portuguese`, `dutch`, que Gladys n'utilise pas). Les variantes `_24l`
+  (`french_24l`…) sont des préversions plus grosses, meilleures et plus
+  lentes.
+- Un serveur par langue : pour parler français et anglais, lancez deux
+  serveurs sur deux ports (`--port 8001`). Avec un seul serveur, toutes les
+  langues sont dites par son modèle.
+- Les modèles et les voix sont téléchargés depuis Hugging Face au premier
+  démarrage, puis gardés en cache.
+- Voix : licences sur
+  [kyutai/tts-voices](https://huggingface.co/kyutai/tts-voices).
+- Sans lien avec Kyutai.
 
 ## Configuration
 
-1. Ouvrez l'onglet **Configuration** de l'intégration.
-2. Renseignez la **latitude** et la **longitude** que la station météo de
-   démonstration doit observer (Paris par défaut), et choisissez votre unité
-   de température. L'**intervalle de rafraîchissement** règle la fréquence
-   de lecture de la station météo et de la puissance de la prise : toutes
-   les 5 minutes par défaut, toutes les minutes au plus.
-3. Enregistrez : les appareils apparaissent dans l'onglet **Découverte**,
-   prêts à être ajoutés.
+1. Installez l'intégration, puis ouvrez son onglet **Configuration**.
+2. **Adresse du serveur** : l'adresse de votre serveur Pocket TTS, par exemple
+   `http://<hôte>:8000`. Un simple `hôte:port` est complété par `http://`. Il
+   parle toutes les langues qui n'ont pas leur propre serveur.
+3. **Serveur pour le français / l'anglais / l'allemand / l'espagnol**
+   (facultatif) : l'adresse d'un serveur lancé avec cette langue. Vide : le
+   serveur principal la parle.
+4. **Voix** : une par langue. Une voix intégrée (`estelle`, `alba`,
+   `juergen`, `lola`, `marius`, `cosette`…), ou une adresse `hf://` ou
+   `https://` d'un fichier WAV à cloner. Vide : la voix par défaut du serveur
+   (celle de sa langue).
+5. Enregistrez, puis appuyez sur **Afficher les voix** pour voir les voix
+   intégrées, et sur **Tester la voix** pour vérifier qu'un clip revient
+   (secondes de son et temps mis ; le bouton ne le joue pas).
+6. Ouvrez **Intégrations → Intelligence artificielle** et choisissez Pocket
+   TTS dans la carte **Voix**.
 
-Le réglage **Préférer la connexion locale** pilote la prise de
-démonstration : elle affiche en badge le canal réellement utilisé (local ou
-cloud), avec un point orange quand elle fonctionne en mode dégradé (local
-refusé, bascule cloud).
+## Utilisation dans les scènes
 
-## Actions
+Ajoutez une action **Parler sur une enceinte** à une scène, choisissez une
+enceinte et tapez le texte. Gladys demande le clip à cette intégration, puis le
+sert à l'enceinte sur votre réseau local.
 
-- **Tester le fournisseur météo** — effectue une requête en direct vers
-  Open-Meteo et affiche la température et l'humidité actuelles sous le
-  bouton.
-- **Identifier un appareil** — choisissez un de vos appareils dans la liste
-  et il se signale (la lampe de démonstration « clignote » dans les logs).
+Les déclencheurs **Serveur Pocket TTS indisponible** (un serveur ne répond
+plus) et **Serveur Pocket TTS revenu** lancent une scène, par exemple pour vous
+envoyer un message. Les serveurs sont vérifiés toutes les 5 minutes.
 
-## Scènes
+L'assistant vocal de Gladys reste en texte avec une intégration de voix : sa
+page passe en HTTPS, et le clip est servi sur le réseau local en HTTP, ce que
+le navigateur bloque. C'est une limite de Gladys, la même pour toutes les
+intégrations de voix.
 
-L'intégration ajoute ses propres cartes à l'éditeur de scènes (Gladys 5.1
-ou plus récent), dans la catégorie **Intégrations** :
+## Limites
 
-- **Mouvement détecté** (déclencheur) — lance la scène quand un détecteur
-  de démonstration voit bouger quelque chose. Choisissez éventuellement le
-  détecteur et ce qui a bougé (personne, animal) ; laissés vides, toute
-  détection correspond. Les actions suivantes peuvent lire ce qui a bougé
-  avec `{{triggerEvent.data.target}}`.
-- **Identifier un appareil** (action) — fait se signaler l'appareil choisi.
-  Elle indique si l'appareil a pu se signaler, pour que les actions
-  suivantes puissent en dépendre.
-
-## Tableau de bord
-
-Ajoutez le widget **État de la démo** à un tableau de bord : il affiche en
-direct la température de la station météo et la puissance de la prise du
-bureau, la connexion utilisée par la prise (en orange si dégradée) et la
-position observée. Son bouton **Identifier la lampe** fait se signaler la
-lampe de démonstration.
+- **Gladys attend 30 secondes** le clip. Mesuré sur un mini PC à 4 cœurs : 2 s
+  pour une phrase de 50 caractères, 8 s pour 300, 20 s pour 600. Gardez des
+  annonces de **moins de 600 caractères environ**. Un texte qui dépasse le
+  délai échoue sans marquer le serveur indisponible.
+- **Cloner une voix** depuis un fichier (`hf://`, `https://`) demande le
+  modèle de clonage : acceptez ses conditions sur
+  [huggingface.co/kyutai/pocket-tts](https://huggingface.co/kyutai/pocket-tts)
+  et connectez-vous sur la machine du serveur (`uvx hf auth login`). Les voix
+  intégrées marchent sans.
+- Les clips sont en WAV (24 kHz). Gladys refuse les clips de plus de 5 Mo
+  (environ 100 secondes) : un clip plus long est rééchantillonné plus bas.
+- Un clip déjà fait (même texte, serveur et voix) est gardé en mémoire (les 16
+  derniers), et une annonce sur plusieurs enceintes ne sollicite le serveur
+  qu'une fois.
+- Pas de réglage de vitesse : Pocket TTS n'en a pas.
 
 ## Dépannage
 
-L'intégration journalise tout ce qu'elle fait : consultez les logs de
-l'intégration depuis l'interface Gladys (ou `docker logs` sur l'hôte) avec
-`LOG_LEVEL=debug` pour le détail complet.
+- La **Supervision** indique si les serveurs répondent, et nomme celui qui ne
+  répond pas.
+- Une annonce ratée est écrite dans les **journaux** de l'intégration, avec la
+  raison donnée par le serveur (voix qu'il ne peut pas charger, pas de réponse
+  à temps…). Le texte dit n'est jamais écrit.
+- « Injoignable » : vérifiez le port (8000 par
+  défaut) et que le serveur a été lancé avec `--host 0.0.0.0` (par défaut, il
+  n'écoute que sa propre machine).
+- Plus de détails en debug : passez le niveau de journal de l'intégration en
+  debug.
