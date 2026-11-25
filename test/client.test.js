@@ -89,7 +89,12 @@ test('an answer that is no WAV is an invalid response; a refused connection, unr
 test('a synthesis that runs out of time is a timeout', async () => {
   const fetch = async (url, { signal }) =>
     new Promise((resolve, reject) => {
-      signal.addEventListener('abort', () => reject(signal.reason));
+      // AbortSignal.timeout does not hold the event loop: this timer does.
+      const hold = setTimeout(() => {}, 5000);
+      signal.addEventListener('abort', () => {
+        clearTimeout(hold);
+        reject(signal.reason);
+      });
     });
   const err = await new PocketTtsClient({ fetch, speechTimeoutMs: 20 })
     .speak({ baseUrl: BASE, voice: '' }, 'Long.')
