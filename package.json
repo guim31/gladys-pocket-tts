@@ -1,8 +1,8 @@
 {
-  "name": "gladys-integration-template-js",
+  "name": "gladys-pocket-tts",
   "version": "1.0.0",
   "private": true,
-  "description": "Official starter template to build an external integration for Gladys Assistant with the JavaScript SDK.",
+  "description": "Gladys Assistant text-to-speech provider for Pocket TTS, the CPU speech model of Kyutai, run on your network.",
   "type": "module",
   "main": "index.js",
   "scripts": {

@@ -1,177 +1,450 @@
 {
   "manifest_version": 1,
-  "type": "device",
-  "name": "Demo Devices Template",
+  "type": "tts",
+  "name": "Pocket TTS",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "A natural voice for Gladys with Pocket TTS by Kyutai, on your network, without graphics card.",
+    "fr": "Une voix naturelle pour Gladys avec Pocket TTS de Kyutai, sur votre réseau, sans carte graphique.",
+    "de": "Eine natürliche Stimme für Gladys mit Pocket TTS von Kyutai, in deinem Netzwerk, ohne Grafikkarte.",
+    "es": "Una voz natural para Gladys con Pocket TTS de Kyutai, en su red, sin tarjeta gráfica."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
-  "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "docker_image": "ghcr.io/guim31/gladys-pocket-tts:1.0.0",
+  "gladys_version": ">=5.3.0",
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-pocket-tts/main/cover.png",
+  "categories": ["assistants"],
+  "keywords": [
+    "pocket-tts",
+    "pocket tts",
+    "kyutai",
+    "tts",
+    "text-to-speech",
+    "synthèse vocale",
+    "voix",
+    "voice",
+    "local",
+    "cpu"
+  ],
+  "transports": ["local"],
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "Your Pocket TTS server",
+        "fr": "Votre serveur Pocket TTS",
+        "de": "Dein Pocket-TTS-Server",
+        "es": "Su servidor Pocket TTS"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "Pocket TTS runs on a simple processor, without graphics card. Start it on your network with `pocket-tts serve --host 0.0.0.0 --language french` (one language per server). Once saved, choose this voice in Integrations → Artificial Intelligence → Voice.",
+        "fr": "Pocket TTS tourne sur un simple processeur, sans carte graphique. Lancez-le sur votre réseau avec `pocket-tts serve --host 0.0.0.0 --language french` (une langue par serveur). Une fois enregistré, choisissez cette voix dans Intégrations → Intelligence artificielle → Voix.",
+        "de": "Pocket TTS läuft auf einem einfachen Prozessor, ohne Grafikkarte. Starte es in deinem Netzwerk mit `pocket-tts serve --host 0.0.0.0 --language french` (eine Sprache pro Server). Wähle danach diese Stimme unter Integrationen → Künstliche Intelligenz → Stimme.",
+        "es": "Pocket TTS funciona con un simple procesador, sin tarjeta gráfica. Inícielo en su red con `pocket-tts serve --host 0.0.0.0 --language french` (un idioma por servidor). Una vez guardado, elija esta voz en Integraciones → Inteligencia artificial → Voz."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "url": "https://github.com/kyutai-labs/pocket-tts",
+          "label": {
+            "en": "Pocket TTS (installation)",
+            "fr": "Pocket TTS (installation)",
+            "de": "Pocket TTS (Installation)",
+            "es": "Pocket TTS (instalación)"
+          }
+        },
+        {
+          "url": "https://huggingface.co/kyutai/tts-voices",
+          "label": {
+            "en": "Voices and their licenses",
+            "fr": "Les voix et leurs licences",
+            "de": "Die Stimmen und ihre Lizenzen",
+            "es": "Las voces y sus licencias"
+          }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
+      "key": "base_url",
+      "type": "string",
+      "label": {
+        "en": "Server address",
+        "fr": "Adresse du serveur",
+        "de": "Serveradresse",
+        "es": "Dirección del servidor"
       },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
-    },
-    {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
       "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
+        "en": "Address of the Pocket TTS server, port 8000 by default. It speaks every language that has no server of its own below.",
+        "fr": "Adresse du serveur Pocket TTS, port 8000 par défaut. Il parle toutes les langues qui n'ont pas leur propre serveur ci-dessous.",
+        "de": "Adresse des Pocket-TTS-Servers, standardmäßig Port 8000. Er spricht jede Sprache, die unten keinen eigenen Server hat.",
+        "es": "Dirección del servidor Pocket TTS, puerto 8000 por defecto. Habla todos los idiomas que no tengan su propio servidor abajo."
       },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
+      "placeholder": {
+        "en": "http://192.0.2.10:8000",
+        "fr": "http://192.0.2.10:8000",
+        "de": "http://192.0.2.10:8000",
+        "es": "http://192.0.2.10:8000"
+      },
+      "required": true
     },
     {
-      "key": "unit",
-      "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
-      "required": false,
-      "default": "celsius",
-      "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
-      ]
-    },
-    {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "key": "base_url_fr",
+      "type": "string",
+      "label": {
+        "en": "Server for French (optional)",
+        "fr": "Serveur pour le français (facultatif)",
+        "de": "Server für Französisch (optional)",
+        "es": "Servidor para el francés (opcional)"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "A server started with --language french. Empty: the main server speaks French.",
+        "fr": "Un serveur lancé avec --language french. Vide : le serveur principal parle le français.",
+        "de": "Ein Server, gestartet mit --language french. Leer: Der Hauptserver spricht Französisch.",
+        "es": "Un servidor iniciado con --language french. Vacío: el servidor principal habla el francés."
+      },
+      "placeholder": {
+        "en": "http://192.0.2.10:8001",
+        "fr": "http://192.0.2.10:8001",
+        "de": "http://192.0.2.10:8001",
+        "es": "http://192.0.2.10:8001"
       },
       "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
+      "default": ""
+    },
+    {
+      "key": "base_url_en",
+      "type": "string",
+      "label": {
+        "en": "Server for English (optional)",
+        "fr": "Serveur pour l'anglais (facultatif)",
+        "de": "Server für Englisch (optional)",
+        "es": "Servidor para el inglés (opcional)"
+      },
+      "description": {
+        "en": "A server started with --language english. Empty: the main server speaks English.",
+        "fr": "Un serveur lancé avec --language english. Vide : le serveur principal parle l'anglais.",
+        "de": "Ein Server, gestartet mit --language english. Leer: Der Hauptserver spricht Englisch.",
+        "es": "Un servidor iniciado con --language english. Vacío: el servidor principal habla el inglés."
+      },
+      "placeholder": {
+        "en": "http://192.0.2.10:8001",
+        "fr": "http://192.0.2.10:8001",
+        "de": "http://192.0.2.10:8001",
+        "es": "http://192.0.2.10:8001"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "base_url_de",
+      "type": "string",
+      "label": {
+        "en": "Server for German (optional)",
+        "fr": "Serveur pour l'allemand (facultatif)",
+        "de": "Server für Deutsch (optional)",
+        "es": "Servidor para el alemán (opcional)"
+      },
+      "description": {
+        "en": "A server started with --language german. Empty: the main server speaks German.",
+        "fr": "Un serveur lancé avec --language german. Vide : le serveur principal parle l'allemand.",
+        "de": "Ein Server, gestartet mit --language german. Leer: Der Hauptserver spricht Deutsch.",
+        "es": "Un servidor iniciado con --language german. Vacío: el servidor principal habla el alemán."
+      },
+      "placeholder": {
+        "en": "http://192.0.2.10:8001",
+        "fr": "http://192.0.2.10:8001",
+        "de": "http://192.0.2.10:8001",
+        "es": "http://192.0.2.10:8001"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "base_url_es",
+      "type": "string",
+      "label": {
+        "en": "Server for Spanish (optional)",
+        "fr": "Serveur pour l'espagnol (facultatif)",
+        "de": "Server für Spanisch (optional)",
+        "es": "Servidor para el español (opcional)"
+      },
+      "description": {
+        "en": "A server started with --language spanish. Empty: the main server speaks Spanish.",
+        "fr": "Un serveur lancé avec --language spanish. Vide : le serveur principal parle l'espagnol.",
+        "de": "Ein Server, gestartet mit --language spanish. Leer: Der Hauptserver spricht Spanisch.",
+        "es": "Un servidor iniciado con --language spanish. Vacío: el servidor principal habla el español."
+      },
+      "placeholder": {
+        "en": "http://192.0.2.10:8001",
+        "fr": "http://192.0.2.10:8001",
+        "de": "http://192.0.2.10:8001",
+        "es": "http://192.0.2.10:8001"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "voice_fr",
+      "type": "string",
+      "label": {
+        "en": "Voice for French",
+        "fr": "Voix pour le français",
+        "de": "Stimme für Französisch",
+        "es": "Voz para el francés"
+      },
+      "description": {
+        "en": "A built-in voice (estelle, alba, juergen, lola…) or an hf:// or https:// address of a WAV file to clone. Empty: the default voice of the server.",
+        "fr": "Une voix intégrée (estelle, alba, juergen, lola…) ou une adresse hf:// ou https:// d'un fichier WAV à cloner. Vide : la voix par défaut du serveur.",
+        "de": "Eine eingebaute Stimme (estelle, alba, juergen, lola…) oder eine hf://- oder https://-Adresse einer WAV-Datei zum Klonen. Leer: die Standardstimme des Servers.",
+        "es": "Una voz integrada (estelle, alba, juergen, lola…) o una dirección hf:// o https:// de un archivo WAV para clonar. Vacío: la voz predeterminada del servidor."
+      },
+      "placeholder": {
+        "en": "estelle",
+        "fr": "estelle",
+        "de": "estelle",
+        "es": "estelle"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "voice_en",
+      "type": "string",
+      "label": {
+        "en": "Voice for English",
+        "fr": "Voix pour l'anglais",
+        "de": "Stimme für Englisch",
+        "es": "Voz para el inglés"
+      },
+      "description": {
+        "en": "A built-in voice (estelle, alba, juergen, lola…) or an hf:// or https:// address of a WAV file to clone. Empty: the default voice of the server.",
+        "fr": "Une voix intégrée (estelle, alba, juergen, lola…) ou une adresse hf:// ou https:// d'un fichier WAV à cloner. Vide : la voix par défaut du serveur.",
+        "de": "Eine eingebaute Stimme (estelle, alba, juergen, lola…) oder eine hf://- oder https://-Adresse einer WAV-Datei zum Klonen. Leer: die Standardstimme des Servers.",
+        "es": "Una voz integrada (estelle, alba, juergen, lola…) o una dirección hf:// o https:// de un archivo WAV para clonar. Vacío: la voz predeterminada del servidor."
+      },
+      "placeholder": {
+        "en": "alba",
+        "fr": "alba",
+        "de": "alba",
+        "es": "alba"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "voice_de",
+      "type": "string",
+      "label": {
+        "en": "Voice for German",
+        "fr": "Voix pour l'allemand",
+        "de": "Stimme für Deutsch",
+        "es": "Voz para el alemán"
+      },
+      "description": {
+        "en": "A built-in voice (estelle, alba, juergen, lola…) or an hf:// or https:// address of a WAV file to clone. Empty: the default voice of the server.",
+        "fr": "Une voix intégrée (estelle, alba, juergen, lola…) ou une adresse hf:// ou https:// d'un fichier WAV à cloner. Vide : la voix par défaut du serveur.",
+        "de": "Eine eingebaute Stimme (estelle, alba, juergen, lola…) oder eine hf://- oder https://-Adresse einer WAV-Datei zum Klonen. Leer: die Standardstimme des Servers.",
+        "es": "Una voz integrada (estelle, alba, juergen, lola…) o una dirección hf:// o https:// de un archivo WAV para clonar. Vacío: la voz predeterminada del servidor."
+      },
+      "placeholder": {
+        "en": "juergen",
+        "fr": "juergen",
+        "de": "juergen",
+        "es": "juergen"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "voice_es",
+      "type": "string",
+      "label": {
+        "en": "Voice for Spanish",
+        "fr": "Voix pour l'espagnol",
+        "de": "Stimme für Spanisch",
+        "es": "Voz para el español"
+      },
+      "description": {
+        "en": "A built-in voice (estelle, alba, juergen, lola…) or an hf:// or https:// address of a WAV file to clone. Empty: the default voice of the server.",
+        "fr": "Une voix intégrée (estelle, alba, juergen, lola…) ou une adresse hf:// ou https:// d'un fichier WAV à cloner. Vide : la voix par défaut du serveur.",
+        "de": "Eine eingebaute Stimme (estelle, alba, juergen, lola…) oder eine hf://- oder https://-Adresse einer WAV-Datei zum Klonen. Leer: die Standardstimme des Servers.",
+        "es": "Una voz integrada (estelle, alba, juergen, lola…) o una dirección hf:// o https:// de un archivo WAV para clonar. Vacío: la voz predeterminada del servidor."
+      },
+      "placeholder": {
+        "en": "lola",
+        "fr": "lola",
+        "de": "lola",
+        "es": "lola"
+      },
+      "required": false,
+      "default": ""
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
-      "timeout_seconds": 30
-    },
-    {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
+      "key": "test_voice",
+      "label": {
+        "en": "Test the voice",
+        "fr": "Tester la voix",
+        "de": "Stimme testen",
+        "es": "Probar la voz"
+      },
+      "description": {
+        "en": "Speaks a test sentence with the saved settings and shows the result (save first).",
+        "fr": "Fait dire une phrase de test avec les réglages enregistrés et affiche le résultat (enregistrez d'abord).",
+        "de": "Lässt einen Testsatz mit den gespeicherten Einstellungen sprechen und zeigt das Ergebnis (zuerst speichern).",
+        "es": "Hace decir una frase de prueba con los ajustes guardados y muestra el resultado (guarde primero)."
+      },
+      "timeout_seconds": 30,
       "fields": [
         {
-          "key": "device",
+          "key": "language",
           "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
+          "label": {
+            "en": "Language",
+            "fr": "Langue",
+            "de": "Sprache",
+            "es": "Idioma"
+          },
+          "required": false,
+          "options": [
+            {
+              "value": "fr",
+              "label": {
+                "en": "French",
+                "fr": "Français",
+                "de": "Französisch",
+                "es": "Francés"
+              }
+            },
+            {
+              "value": "en",
+              "label": {
+                "en": "English",
+                "fr": "Anglais",
+                "de": "Englisch",
+                "es": "Inglés"
+              }
+            },
+            {
+              "value": "de",
+              "label": {
+                "en": "German",
+                "fr": "Allemand",
+                "de": "Deutsch",
+                "es": "Alemán"
+              }
+            },
+            {
+              "value": "es",
+              "label": {
+                "en": "Spanish",
+                "fr": "Espagnol",
+                "de": "Spanisch",
+                "es": "Español"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "list_voices",
+      "label": {
+        "en": "Show the voices",
+        "fr": "Afficher les voix",
+        "de": "Stimmen anzeigen",
+        "es": "Mostrar las voces"
+      },
+      "description": {
+        "en": "Lists the built-in voices of Pocket TTS, those recorded in the language first.",
+        "fr": "Liste les voix intégrées de Pocket TTS, celles enregistrées dans la langue d'abord.",
+        "de": "Listet die eingebauten Stimmen von Pocket TTS auf, zuerst die in der Sprache aufgenommenen.",
+        "es": "Enumera las voces integradas de Pocket TTS, primero las grabadas en el idioma."
+      },
+      "timeout_seconds": 10,
+      "fields": [
+        {
+          "key": "language",
+          "type": "select",
+          "label": {
+            "en": "Language",
+            "fr": "Langue",
+            "de": "Sprache",
+            "es": "Idioma"
+          },
+          "required": false,
+          "options": [
+            {
+              "value": "fr",
+              "label": {
+                "en": "French",
+                "fr": "Français",
+                "de": "Französisch",
+                "es": "Francés"
+              }
+            },
+            {
+              "value": "en",
+              "label": {
+                "en": "English",
+                "fr": "Anglais",
+                "de": "Englisch",
+                "es": "Inglés"
+              }
+            },
+            {
+              "value": "de",
+              "label": {
+                "en": "German",
+                "fr": "Allemand",
+                "de": "Deutsch",
+                "es": "Alemán"
+              }
+            },
+            {
+              "value": "es",
+              "label": {
+                "en": "Spanish",
+                "fr": "Espagnol",
+                "de": "Spanisch",
+                "es": "Español"
+              }
+            }
+          ]
         }
       ]
     }
   ],
   "scene_triggers": [
     {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
-      "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+      "key": "server_offline",
+      "label": {
+        "en": "Pocket TTS server unavailable",
+        "fr": "Serveur Pocket TTS indisponible",
+        "de": "Pocket-TTS-Server nicht verfügbar",
+        "es": "Servidor Pocket TTS no disponible"
       },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
-        },
-        {
-          "key": "target",
-          "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
-          "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
-          ]
-        }
-      ],
-      "variables": [
-        {
-          "key": "target",
-          "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
-        }
-      ]
-    }
-  ],
-  "scene_actions": [
+      "description": {
+        "en": "A Pocket TTS server stopped answering: announcements fail until it is back.",
+        "fr": "Un serveur Pocket TTS ne répond plus : les annonces échouent jusqu'à son retour.",
+        "de": "Ein Pocket-TTS-Server antwortet nicht mehr: Durchsagen schlagen fehl, bis er zurück ist.",
+        "es": "Un servidor Pocket TTS ya no responde: los anuncios fallan hasta que vuelva."
+      }
+    },
     {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
+      "key": "server_online",
+      "label": {
+        "en": "Pocket TTS server back",
+        "fr": "Serveur Pocket TTS revenu",
+        "de": "Pocket-TTS-Server wieder da",
+        "es": "Servidor Pocket TTS de vuelta"
       },
-      "timeout_seconds": 15,
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ],
-      "outputs": [
-        {
-          "key": "signalled",
-          "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
-        }
-      ]
-    }
-  ],
-  "widgets": [
-    {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
       "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
-      },
-      "icon": "activity",
-      "action_timeout_seconds": 15
+        "en": "The Pocket TTS servers answer again after an outage.",
+        "fr": "Les serveurs Pocket TTS répondent de nouveau après une panne.",
+        "de": "Die Pocket-TTS-Server antworten nach einem Ausfall wieder.",
+        "es": "Los servidores Pocket TTS vuelven a responder tras una avería."
+      }
     }
   ]
 }
