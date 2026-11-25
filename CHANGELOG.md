@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-25
+
 ### Added
 
 - Pocket TTS (Kyutai) as the voice of Gladys (5.3.0 or later): the scene
@@ -24,3 +26,6 @@ the notes of the version's GitHub Release.
 - WAV clips with exact sizes, resampled when over the 5 MB Gladys accepts; one
   announcement on several speakers asks the server once.
 - Documentation in English, French, German and Spanish.
+
+[Unreleased]: https://github.com/guim31/gladys-pocket-tts/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/guim31/gladys-pocket-tts/releases/tag/v1.0.0
