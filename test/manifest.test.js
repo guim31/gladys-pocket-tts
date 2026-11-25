@@ -16,7 +16,6 @@ const manifest = JSON.parse(
 );
 const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
 
-
 function minGladysVersion() {
   const match = manifest.gladys_version.match(/>=\s*(\d+)\.(\d+)\.(\d+)/);
   assert.ok(match, 'gladys_version must declare a minimum version');

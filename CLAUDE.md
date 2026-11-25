@@ -16,8 +16,8 @@ its only runtime dependency. It started from the official JavaScript template.
 ```bash
 npm install
 npm test                                  # node --test, the built-in runner
-node --test test/devices.test.js          # one file
-node --test --test-name-pattern "plug"    # tests whose name matches
+node --test test/integration.test.js      # one file
+node --test --test-name-pattern "voice"   # tests whose name matches
 npm run lint                              # ESLint
 npm run format:check                      # Prettier, as the CI runs it
 npm run format                            # Prettier, fix in place
@@ -31,16 +31,17 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
-src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
-gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
+index.js                          SDK wiring only (registerHandlers + connect)
+src/app.js                        handlers: onTtsSynthesize, actions, config, lifecycle
+src/integration.js                PocketTts: synthesis, memory, status, scene triggers, buttons
+src/pocket/client.js              HTTP client of `pocket-tts serve`: POST /tts, GET /health
+src/wav.js                        WAV header repair, resampling over 5 MB
+src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults), servers and voices per language
+src/lifecycle.js                  exit on an unhandled rejection
+gladys-assistant-integration.json manifest: type tts, config_schema, actions, scene_triggers
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys
 test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+test/fixtures/pocket-tts/         real answers of `pocket-tts serve` 3.3.0 (streamed WAV, errors)
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -259,3 +260,31 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - Docs `en`, `fr`, `de`, `es` avec les mêmes sections.
 - Chauffe, ouverture, sécurité : ne rien rendre pilotable « comme un thermostat » ou par un assistant
   vocal quand une erreur serait dangereuse (leçon d'OctoPrint).
+
+## Pocket TTS (cette intégration)
+
+- API de `pocket-tts serve` (Python et binaire autonome Rust, même API) : `POST /tts` en formulaire
+  (`application/x-www-form-urlencoded` ou multipart, sinon 422) avec `text` et `voice_url` facultatif ;
+  `GET /health` → `{"status":"healthy"}`. Ni liste de voix, ni vitesse, ni format : WAV 16 bits mono 24 kHz
+  seulement. Pas d'image Docker officielle : les tests réels ont tourné avec le binaire des releases dans
+  une image Debian maison.
+- **Un serveur = un modèle de langue** (`--language french`, `english`, `german`, `spanish`…) : d'où un
+  serveur principal et un serveur facultatif par langue (`base_url_<lang>`), avec repli sur le principal.
+- `voice_url` : nom d'une des 27 voix intégrées (`_ORIGINS_OF_PREDEFINED_VOICES`), qui marchent avec
+  **tous** les modèles (vérifié : alba, cosette, juergen, lola sur le modèle français), ou `hf://` /
+  `https://` d'un fichier à cloner. Le clonage exige le modèle à clonage, derrière une connexion Hugging
+  Face sur le serveur : sans elle, **500 sans détail** (`Internal Server Error`), d'où `voice_failed`
+  quand une voix est demandée. Un nom inconnu → 400 `voice_url must start with…`.
+- **En-tête WAV mensonger** : le serveur écrit en flux et annonce `data` = 2 000 000 000 octets. Les
+  tailles sont réécrites (`src/wav.js`) ; au-delà de 5 Mo (≈ 100 s), rééchantillonnage 16/12/8 kHz
+  (moyenne par boîte). La limite du SDK est 5 MiB, on garde 5 000 000.
+- Une erreur au milieu de la génération coupe le flux après le 200 : impossible à distinguer d'une fin
+  normale, le clip est juste plus court.
+- Le serveur ne génère qu'**un texte à la fois** (verrou) : la mutualisation des requêtes identiques
+  (même annonce sur plusieurs enceintes) compte.
+- Mesuré le 25/11/2026 (binaire 3.3.0, 4 cœurs partagés) : 0,5 s pour « Oui. », 2 s pour 50 caractères
+  (3,6 s de son), 7,7 s pour 300, 19,6 s pour 600. Gladys attend 30 s : délai de 25 s, un délai dépassé
+  en synthèse ne marque pas le serveur hors ligne ; seul « injoignable » le fait depuis une synthèse.
+  Environ 500 Mo de mémoire par serveur.
+- Les erreurs de synthèse remontent au cœur en **texte anglais** (`Error`), celles des actions en objet
+  `{ en, fr, de, es }` (`ActionFailure`, rouge dans l'interface).

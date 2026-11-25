@@ -54,10 +54,10 @@ export const MESSAGES = {
     es: 'El servidor Pocket TTS no responde a tiempo: mantenga los anuncios cortos (Gladys espera 30 segundos).',
   },
   not_found: {
-    en: 'No Pocket TTS server at this address: check the port (8000 by default) and remove any path.',
-    fr: 'Pas de serveur Pocket TTS à cette adresse : vérifiez le port (8000 par défaut) et retirez tout chemin.',
-    de: 'Kein Pocket-TTS-Server unter dieser Adresse: Prüfe den Port (standardmäßig 8000) und entferne jeden Pfad.',
-    es: 'No hay ningún servidor Pocket TTS en esta dirección: compruebe el puerto (8000 por defecto) y quite cualquier ruta.',
+    en: 'No Pocket TTS server at this address: check the port (8000 by default) and the path.',
+    fr: 'Pas de serveur Pocket TTS à cette adresse : vérifiez le port (8000 par défaut) et le chemin.',
+    de: 'Kein Pocket-TTS-Server unter dieser Adresse: Prüfe den Port (standardmäßig 8000) und den Pfad.',
+    es: 'No hay ningún servidor Pocket TTS en esta dirección: compruebe el puerto (8000 por defecto) y la ruta.',
   },
   rejected: {
     en: 'The Pocket TTS server refuses the request: a voice is a built-in name (estelle, alba…) or an hf:// or https:// address.',
