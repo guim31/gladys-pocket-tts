@@ -67,7 +67,7 @@ on your local network.
 
 The triggers **Pocket TTS server unavailable** (a server stopped answering)
 and **Pocket TTS server back** start a scene, for example to send you a
-message. The servers are checked every 5 minutes and at each announcement.
+message. The servers are checked every 5 minutes.
 
 The voice assistant of Gladys stays text-only with a voice integration: its
 page runs over HTTPS, and the clip is served over the local network in HTTP,

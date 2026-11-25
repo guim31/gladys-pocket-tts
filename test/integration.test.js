@@ -313,3 +313,77 @@ test('a request arriving before the configuration is read waits for it', async (
   assert.match(clip, /^audio\/wav;base64,/);
   assert.equal(fetch.speech().at(-1).form.voice_url, 'marius');
 });
+
+test('with several servers, a success on one does not call back the one still down', async () => {
+  const { gladys } = await setup({
+    config: { base_url: BASE, base_url_en: EN },
+    routes: { [`${EN}/health`]: refused },
+  });
+  assert.equal((await gladys.fake.ttsSynthesize('Bonjour.', 'fr')).success, true);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(triggers(gladys), ['server_offline']);
+  assert.equal(gladys.fake.connectionStatus.connected, false);
+});
+
+test('an invalid server of a language fails that language, never on the main server', async () => {
+  const { gladys, fetch } = await setup({
+    config: { base_url: BASE, base_url_en: 'http://user:pass@192.0.2.10:8001' },
+  });
+  const ack = await gladys.fake.ttsSynthesize('Hello.', 'en');
+  assert.equal(ack.success, false);
+  assert.match(ack.error, /not valid/);
+  assert.equal(fetch.speech().length, 0);
+  assert.equal((await gladys.fake.ttsSynthesize('Bonjour.', 'fr')).success, true);
+});
+
+test('a check that runs out of time says so, without the advice about long texts', async () => {
+  const { gladys } = await setup({
+    routes: {
+      '/health': () => {
+        throw new DOMException('The operation timed out.', 'TimeoutError');
+      },
+    },
+  });
+  assert.deepEqual(gladys.fake.connectionStatus, {
+    connected: false,
+    message: MESSAGES.health_timeout,
+  });
+});
+
+test('a refusal without voice does not blame the voice', async () => {
+  const { gladys } = await setup({ routes: { '/tts': () => json('{"detail":"Bad"}', 400) } });
+  const ack = await gladys.fake.ttsSynthesize('Bonjour.', 'fr');
+  assert.match(
+    ack.error,
+    /^The Pocket TTS server refuses the request\. Check its logs\. \[.*Bad\]/,
+  );
+});
+
+test('a status Gladys did not take is published again at the next check', async () => {
+  const { gladys, tts } = await setup();
+  let fail = true;
+  const published = [];
+  gladys.setConnectionStatus = async (connected) => {
+    if (fail) {
+      throw new Error('HTTP 500');
+    }
+    published.push(connected);
+  };
+  tts.status = null;
+  await tts.check();
+  fail = false;
+  await tts.check();
+  assert.deepEqual(published, [true]);
+});
+
+test('the clips kept in memory stay under 20 MB', async () => {
+  const header = Buffer.from(CLIPS.ouiFr.subarray(0, 44));
+  const big = Buffer.concat([header, Buffer.alloc(24000 * 2 * 90)]);
+  const { gladys, tts } = await setup({ routes: { '/tts': () => wav(big) } });
+  for (let i = 0; i < 6; i += 1) {
+    assert.equal((await gladys.fake.ttsSynthesize(`Texte ${i}.`, 'fr')).success, true);
+  }
+  const bytes = [...tts.cache.values()].reduce((sum, clip) => sum + clip.audio.length, 0);
+  assert.ok(bytes <= 20_000_000, `${bytes} bytes`);
+  assert.equal(tts.cache.size, 4);
+});

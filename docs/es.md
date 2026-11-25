@@ -70,8 +70,7 @@ altavoz en su red local.
 
 Los disparadores **Servidor Pocket TTS no disponible** (un servidor ya no
 responde) y **Servidor Pocket TTS de vuelta** inician una escena, por ejemplo
-para enviarle un mensaje. Los servidores se comprueban cada 5 minutos y en
-cada anuncio.
+para enviarle un mensaje. Los servidores se comprueban cada 5 minutos.
 
 El asistente de voz de Gladys sigue siendo de texto con una integración de
 voz: su página funciona en HTTPS, y el clip se sirve en la red local en HTTP,

@@ -72,8 +72,7 @@ dem Clip und liefert ihn dann im lokalen Netzwerk an den Lautsprecher.
 
 Die Auslöser **Pocket-TTS-Server nicht verfügbar** (ein Server antwortet nicht
 mehr) und **Pocket-TTS-Server wieder da** starten eine Szene, zum Beispiel um
-dir eine Nachricht zu schicken. Die Server werden alle 5 Minuten und bei jeder
-Durchsage geprüft.
+dir eine Nachricht zu schicken. Die Server werden alle 5 Minuten geprüft.
 
 Der Sprachassistent von Gladys bleibt mit einer Stimmintegration textbasiert:
 Seine Seite läuft über HTTPS, und der Clip wird im lokalen Netzwerk über HTTP

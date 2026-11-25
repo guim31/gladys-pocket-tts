@@ -22,7 +22,7 @@ const MAX_DETAIL = 160;
 
 export class SpeechError extends Error {
   /**
-   * @param {'not_configured'|'unreachable'|'timeout'|'not_found'|'rejected'|'voice_failed'|'server'|'invalid_response'|'too_long'} kind - What failed.
+   * @param {'not_configured'|'unreachable'|'timeout'|'not_found'|'rejected'|'rejected_voice'|'voice_failed'|'server'|'invalid_response'|'too_long'} kind - What failed.
    * @param {string} message - Technical detail, for the logs.
    * @param {{status?: number, detail?: string, cause?: unknown}} [options]
    */
@@ -128,7 +128,9 @@ export class PocketTtsClient {
             ? 'voice_failed'
             : status >= 500
               ? 'server'
-              : 'rejected';
+              : voice
+                ? 'rejected_voice'
+                : 'rejected';
       const suffix = detail ? `: ${detail}` : '';
       throw new SpeechError(kind, `${path}: HTTP ${status}${suffix}`, { status, detail });
     }

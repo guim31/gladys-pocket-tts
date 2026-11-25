@@ -356,10 +356,10 @@
         "es": "Mostrar las voces"
       },
       "description": {
-        "en": "Lists the built-in voices of Pocket TTS, those recorded in the language first.",
-        "fr": "Liste les voix intégrées de Pocket TTS, celles enregistrées dans la langue d'abord.",
-        "de": "Listet die eingebauten Stimmen von Pocket TTS auf, zuerst die in der Sprache aufgenommenen.",
-        "es": "Enumera las voces integradas de Pocket TTS, primero las grabadas en el idioma."
+        "en": "Lists the built-in voices of Pocket TTS; with a language, those recorded in it.",
+        "fr": "Liste les voix intégrées de Pocket TTS ; avec une langue, celles enregistrées dans cette langue.",
+        "de": "Listet die eingebauten Stimmen von Pocket TTS auf; mit einer Sprache die in ihr aufgenommenen.",
+        "es": "Enumera las voces integradas de Pocket TTS; con un idioma, las grabadas en él."
       },
       "timeout_seconds": 10,
       "fields": [

@@ -20,6 +20,8 @@ import { PocketTtsClient } from './pocket/client.js';
 
 // Clips kept in memory (a WAV of 10 seconds makes about 480 KB).
 export const CACHE_SIZE = 16;
+// And at most this many bytes of them: the sandbox has 256 MB.
+export const CACHE_BYTES = 20 * 1000 * 1000;
 // Period of the check of the servers, for the status and the scene triggers.
 export const CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
@@ -60,6 +62,18 @@ export const MESSAGES = {
     es: 'No hay ningún servidor Pocket TTS en esta dirección: compruebe el puerto (8000 por defecto) y la ruta.',
   },
   rejected: {
+    en: 'The Pocket TTS server refuses the request. Check its logs.',
+    fr: 'Le serveur Pocket TTS refuse la requête. Consultez ses journaux.',
+    de: 'Der Pocket-TTS-Server lehnt die Anfrage ab. Sieh dir seine Logs an.',
+    es: 'El servidor Pocket TTS rechaza la solicitud. Consulte sus registros.',
+  },
+  health_timeout: {
+    en: 'The Pocket TTS server does not answer in time: check that it is not overloaded.',
+    fr: "Le serveur Pocket TTS ne répond pas à temps : vérifiez qu'il n'est pas surchargé.",
+    de: 'Der Pocket-TTS-Server antwortet nicht rechtzeitig: Prüfe, ob er überlastet ist.',
+    es: 'El servidor Pocket TTS no responde a tiempo: compruebe que no esté sobrecargado.',
+  },
+  rejected_voice: {
     en: 'The Pocket TTS server refuses the request: a voice is a built-in name (estelle, alba…) or an hf:// or https:// address.',
     fr: 'Le serveur Pocket TTS refuse la requête : une voix est un nom intégré (estelle, alba…) ou une adresse hf:// ou https://.',
     de: 'Der Pocket-TTS-Server lehnt die Anfrage ab: Eine Stimme ist ein eingebauter Name (estelle, alba…) oder eine hf://- oder https://-Adresse.',
@@ -389,7 +403,10 @@ export class PocketTts {
         await this.client.health(baseUrl);
       } catch (err) {
         if (generation === this.generation) {
-          await this.markOffline(err, baseUrl);
+          // A check that runs out of time is no long text: its own message.
+          const reason =
+            err?.kind === 'timeout' ? Object.assign(err, { kind: 'health_timeout' }) : err;
+          await this.markOffline(reason, baseUrl);
         }
         return;
       }
@@ -496,6 +513,10 @@ export class PocketTts {
       throw failure(new LocalError('empty', 'nothing to say in the text'));
     }
     const route = routeFor(settings, language);
+    if (settings.invalid.includes(`base_url_${language}`)) {
+      // Never the main server instead: it would read the text with another language model.
+      throw failure(new LocalError('invalid_url', `invalid server address for ${language}`));
+    }
     if (!route.baseUrl) {
       const kind = settings.invalid.length > 0 ? 'invalid_url' : 'not_configured';
       throw failure(new LocalError(kind, 'no valid server address configured'));
@@ -532,13 +553,21 @@ export class PocketTts {
       throw failure(err);
     }
     if (generation === this.generation && this.online === false) {
-      // Back after an outage: the periodic check refines the message later.
-      await this.markOnline(readyMessage(serversOf(settings).length));
+      if (serversOf(settings).length === 1) {
+        // Back after an outage: the periodic check refines the message later.
+        await this.markOnline(readyMessage(1));
+      } else {
+        // This server answers, another may still be down: let the check tell.
+        this.check();
+      }
     }
     if (generation === this.generation) {
       this.cache.set(key, clip);
-      if (this.cache.size > CACHE_SIZE) {
-        this.cache.delete(this.cache.keys().next().value);
+      let bytes = [...this.cache.values()].reduce((sum, kept) => sum + kept.audio.length, 0);
+      while (this.cache.size > CACHE_SIZE || (bytes > CACHE_BYTES && this.cache.size > 1)) {
+        const oldest = this.cache.keys().next().value;
+        bytes -= this.cache.get(oldest).audio.length;
+        this.cache.delete(oldest);
       }
     }
     this.logger.debug(
@@ -604,9 +633,10 @@ export class PocketTts {
     if (this.status?.connected === connected && this.status?.message.en === message.en) {
       return;
     }
-    this.status = { connected, message };
     try {
       await this.gladys.setConnectionStatus(connected, message);
+      // Only once published: a failed one is tried again at the next check.
+      this.status = { connected, message };
     } catch (statusErr) {
       this.logger.warn(`Unable to publish the status: ${statusErr.message}`);
     }

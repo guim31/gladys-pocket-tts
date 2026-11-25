@@ -72,8 +72,7 @@ sert à l'enceinte sur votre réseau local.
 
 Les déclencheurs **Serveur Pocket TTS indisponible** (un serveur ne répond
 plus) et **Serveur Pocket TTS revenu** lancent une scène, par exemple pour vous
-envoyer un message. Les serveurs sont vérifiés toutes les 5 minutes et à
-chaque annonce.
+envoyer un message. Les serveurs sont vérifiés toutes les 5 minutes.
 
 L'assistant vocal de Gladys reste en texte avec une intégration de voix : sa
 page passe en HTTPS, et le clip est servi sur le réseau local en HTTP, ce que
